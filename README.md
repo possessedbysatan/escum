@@ -1,6 +1,5 @@
-# ESCUM
+ＡＥＳＴＨＥＴＩＣ ＶＡＰＯＲＷＡＶＥ
 ---
-Practicas de Sistemas Operativos, profesor Cortes Galicia Jorge. 
-Escuela Superior de Cómputo
+Juan Méndez @ ESCOM
 ---
-#PRAISELINUX
+ＡＥＳＴＨＥＴＩＣ ＶＡＰＯＲＷＡＶＥ
