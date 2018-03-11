@@ -5,9 +5,10 @@
 #include <unistd.h> 
 #include <termios.h> 
 #include <fcntl.h>
+#define BUFFER_SZ 1024
   void clean_stdin();
 int main(int argc, char * argv[]) {
-  char archivillos[512], visualizado[512], fullarchivillos[512], contenido, *string, *nombre_archivo; int i, visor, fuente, destino, bits; void *buf = (char * ) calloc(1024, 1);
+  char archivillos[512], visualizado[512], fullarchivillos[512], contenido, *string, *nombre_archivo; int i, visor, fuente, destino, bits; void *buf = (char * ) calloc(BUFFER_SZ, 1);
   archivillos[0] = '\0', fullarchivillos[0] = '\0';
   if (argv[1] == NULL || argv[2] == NULL) {
     printf("[ERROR] Uso: ./p4 (ruta absoluta de archivo a visualizar) (ruta absuolta destino de archivos a copiar)\n");
@@ -59,7 +60,7 @@ int main(int argc, char * argv[]) {
             chdir(argv[2]); //cambia al directorio destino
             creat(nombre_archivo, 0755); //crea un archivo cualquiera con el mismo nombre
             destino = open(nombre_archivo, O_WRONLY | O_APPEND); //obtener descriptor del nuevo archivo
-            while ((bits = read(fuente, buf, 1024)) > 0) //lee todo el archivo y guarda en bits la cantidad de bits que ha leido
+            while ((bits = read(fuente, buf, BUFFER_SZ)) > 0) //lee todo el archivo y guarda en bits la cantidad de bits que ha leido
 			{
     			if (write(destino, buf, bits) != bits) //escribe en el archivo destino cierta cantidad de bits, y comprueba si se escribio todo
         			printf("[ERROR] No se pudo copiar todo el buffer\n");
@@ -71,7 +72,7 @@ int main(int argc, char * argv[]) {
           } else
             printf("[ERROR] No existe (o no se pudo leer) '%s'\n", nombre_archivo);
         }
-        free(buf);
+        free(buf); //liberar el buffer encargado de copiar despues de usarlo
         return (0);
       }
     } else
