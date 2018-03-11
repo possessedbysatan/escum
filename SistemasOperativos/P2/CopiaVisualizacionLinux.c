@@ -49,6 +49,8 @@ int main(int argc, char * argv[]) {
 		fgets(archivillos,sizeof(archivillos),stdin);
         if (archivillos[0] == '\n') //fullarchivillos tiene una cadena con todos los nombres de los archivos separados por comas
           strncpy(archivillos, fullarchivillos, 511); //reemplaza archivillos con fullarchivillos
+      	else
+      		strtok(archivillos, "\n"); //elimina el \n que fgets introduce 
         //clean_stdin(); //limpiar el buffer de entrada
         string = strdup(archivillos); //clona archivillos y asigna memoria dinamica para la cadena
         while ((nombre_archivo = strsep( & string, ",")) != NULL) //en nombre_archivo guarda cada parte de la cadena
