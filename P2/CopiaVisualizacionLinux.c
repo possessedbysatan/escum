@@ -7,10 +7,10 @@
 #include <fcntl.h>
   void clean_stdin();
 int main(int argc, char * argv[]) {
-  char archivillos[512], visualizado[512], fullarchivillos[512], contenido, *string, *nombre_archivo; int i, visor, fuente, destino, bits; void *buf = (char * ) calloc(1000, sizeof(char));
+  char archivillos[512], visualizado[512], fullarchivillos[512], contenido, *string, *nombre_archivo; int i, visor, fuente, destino, bits; void *buf = (char * ) calloc(1024, 1);
   archivillos[0] = '\0', fullarchivillos[0] = '\0';
   if (argv[1] == NULL || argv[2] == NULL) {
-    printf("[ERROR] Uso: ./p4 (ruta absoluta de archivos a visualizar) (ruta absuolta destino de archivos a copiar)\n");
+    printf("[ERROR] Uso: ./p4 (ruta absoluta de archivo a visualizar) (ruta absuolta destino de archivos a copiar)\n");
     exit(-1);
   } else {
     DIR* carpeta = opendir(argv[1]); //Se verifica si ya existe el directorio
@@ -41,11 +41,13 @@ int main(int argc, char * argv[]) {
             putchar(contenido); //imprime contenido byte por byte
           printf("\n=========================================================\n");
           close(visor); //cierra el descriptor del archivo utilizado
-        } else
+        } 
+        else
           printf("[ERROR] No se pudo leer/abrir %s\n", visualizado);
-        printf("\nIngrese los archivos que desea separados por comas (o 0 si desea copiar todos):\n");
-        scanf("%s", & archivillos);
-        if (archivillos[0] == '0') //fullarchivillos tiene una cadena con todos los nombres de los archivos separados por comas
+        printf("Ingrese los archivos que desea separados por comas (o enter si desea copiar todos):\n");
+        getchar();
+		fgets(archivillos,sizeof(archivillos),stdin);
+        if (archivillos[0] == '\n') //fullarchivillos tiene una cadena con todos los nombres de los archivos separados por comas
           strncpy(archivillos, fullarchivillos, 511); //reemplaza archivillos con fullarchivillos
         clean_stdin(); //limpiar el buffer de entrada
         string = strdup(archivillos); //clona archivillos y asigna memoria dinamica para la cadena
@@ -57,16 +59,19 @@ int main(int argc, char * argv[]) {
             chdir(argv[2]); //cambia al directorio destino
             creat(nombre_archivo, 0755); //crea un archivo cualquiera con el mismo nombre
             destino = open(nombre_archivo, O_WRONLY | O_APPEND); //obtener descriptor del nuevo archivo
-            while ((bits = read(fuente, buf, 1000) > 0)) //escribe de 1000 en 1000 bits
-            {
-              if (write(destino, buf, 1000) != -1 && (access(nombre_archivo, 0) == 0))
-                printf("[  OK ] %s copiado correctamente\n", nombre_archivo); //solo si copia y accede correctamente al archivo
-            } // copiado, se muestra "copiado correctamente"
+            while ((bits = read(fuente, buf, 1024)) > 0) //lee todo el archivo y guarda en bits la cantidad de bits que ha leido
+			{
+    			if (write(destino, buf, bits) != bits) //escribe en el archivo destino cierta cantidad de bits, y comprueba si se escribio todo
+        			printf("[ERROR] No se pudo copiar todo el buffer\n");
+        		else 
+	                printf("[  OK ] %s copiado correctamente\n", nombre_archivo); //solo si copia y accede correctamente al archivo
+			}
             close(destino);   close(fuente); //liberacion de descriptores
             chdir(argv[1]); //cambiar a directorio fuente
           } else
             printf("[ERROR] No existe (o no se pudo leer) '%s'\n", nombre_archivo);
         }
+        free(buf);
         return (0);
       }
     } else
