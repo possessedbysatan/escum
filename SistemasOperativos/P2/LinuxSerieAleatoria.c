@@ -10,10 +10,10 @@
 #define S_MAX 20
 int main(int argc, char *argv[])
 {
-const char *arreglo_nice[] = {"a1\n", "bb2\n", "ccc3\n", "dddd4\n", "5eeeee\n", "6ffffff\n", "7ggggggg\n"};
+const char *arreglo_nice[] = {"a1", "bb2", "ccc3", "dddd4", "5eeeee", "6ffffff", "7ggggggg"}; int arch_creados=0;
 if (argv[1]==NULL)
 {
-	printf("[ERROR] Sin argumentos\n");
+	printf("[ERROR] Uso: ./p1 (ruta del directorio deseado)\n");
 	exit(-1);
 }
 else
@@ -38,18 +38,22 @@ else
 		tamArregloNice = sizeof(arreglo_nice) / (2*sizeof(int)); // Obtiene la cantidad de cadenas presentes en arreglo_nice
 		for(i=0;i<S_MAX;i++)
 		{
-		nombre[0] = '\0'; //Inicializa una cadena para contener el nombre
-		strcat(nombre,"archivo");  //Pega la palabra "archivo" a el nombre
-    	alea[i] = rand()%S_MAX; //Obtiene un valor aleatorio entre 0 y S_MAX
-	    sprintf(buffer, "%d", alea[i]); // convierte el numero a cadena para utilizar 
-	    strcat(nombre,buffer);  //Pega el numero aleatorio al final del archivo
-    	creat(nombre,0755); //crea nuevos archivos, vacios, con permisos 0755
-    	randIndexArregloNice=rand()%tamArregloNice; //Obtiene un elemento aleatoriamente del arreglo_nice
-		s=open(nombre, O_WRONLY | O_APPEND);  //Descriptor del archivo a escribir
-		if(write(s, arreglo_nice[randIndexArregloNice], strlen(arreglo_nice[randIndexArregloNice]))==-1)  //Escribe el elemento aleatorio del arreglo a un archivo 
-			printf("[ERROR] Imposible escribir a los archivos creados.\n");
-		close(s); //Cierra el descriptor del archivo
+			nombre[0] = '\0'; //Inicializa una cadena para contener el nombre
+			strcat(nombre,"archivo");  //Pega la palabra "archivo" a el nombre
+    		alea[i] = rand()%S_MAX; //Obtiene un valor aleatorio entre 0 y S_MAX
+	    	sprintf(buffer, "%d", alea[i]); // convierte el numero a cadena para utilizar 
+	    	strcat(nombre,buffer);  //Pega el numero aleatorio al final del archivo
+	    	if(access(nombre, F_OK) != -1) { //esta funcion se utiliza para obtener el numero de archivos que 
+				arch_creados+=1; 			 //ya existen y se han sobreescrito, para despues imprimir
+    		}								 //la cantidad de archivos aleatorios totales escritos.
+    		creat(nombre,0755); //crea nuevos archivos, vacios, con permisos 0755
+    		randIndexArregloNice=rand()%tamArregloNice; //Obtiene un elemento aleatoriamente del arreglo_nice
+			s=open(nombre, O_WRONLY | O_APPEND);  //Descriptor del archivo a escribir
+			if(write(s, arreglo_nice[randIndexArregloNice], strlen(arreglo_nice[randIndexArregloNice]))==-1)  //Escribe el elemento aleatorio del arreglo a un archivo 
+				printf("[ERROR] Imposible escribir a los archivos creados.\n");
+			close(s); //Cierra el descriptor del archivo
     }
+    printf("[ INFO] cantidad de archivos creados: %d\n",(S_MAX-arch_creados));
     }
     else {
     	printf("[ERROR] Algo sucedio mal al crear el directorio.\n ");
