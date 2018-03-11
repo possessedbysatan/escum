@@ -6,7 +6,6 @@
 #include <termios.h> 
 #include <fcntl.h>
 #define BUFFER_SZ 1024
-  void clean_stdin();
 int main(int argc, char * argv[]) {
   char archivillos[512], visualizado[512], fullarchivillos[512], contenido, *string, *nombre_archivo; int i, visor, fuente, destino, bits; void *buf = (char * ) calloc(BUFFER_SZ, 1);
   archivillos[0] = '\0', fullarchivillos[0] = '\0';
@@ -50,7 +49,7 @@ int main(int argc, char * argv[]) {
 		fgets(archivillos,sizeof(archivillos),stdin);
         if (archivillos[0] == '\n') //fullarchivillos tiene una cadena con todos los nombres de los archivos separados por comas
           strncpy(archivillos, fullarchivillos, 511); //reemplaza archivillos con fullarchivillos
-        clean_stdin(); //limpiar el buffer de entrada
+        //clean_stdin(); //limpiar el buffer de entrada
         string = strdup(archivillos); //clona archivillos y asigna memoria dinamica para la cadena
         while ((nombre_archivo = strsep( & string, ",")) != NULL) //en nombre_archivo guarda cada parte de la cadena
         { //hasta que encuentra un simbolo de coma, siguiendo hasta que la cadena termine
@@ -78,10 +77,4 @@ int main(int argc, char * argv[]) {
     } else
       printf("[ERROR] Alguna de las dos carpetas no existe.\n");
   }
-}
-void clean_stdin() {
-  int stdin_copy = dup(STDIN_FILENO);
-  tcdrain(stdin_copy);
-  tcflush(stdin_copy, TCIFLUSH);
-  close(stdin_copy);
 }
