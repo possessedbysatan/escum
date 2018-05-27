@@ -7,9 +7,7 @@
 #include<sys/wait.h>
 #include<unistd.h>
 #include<sys/syscall.h>
-
-
-#define SIZ_MAX 3
+#define SIZ_MAX 10
 float determ(float a[SIZ_MAX][SIZ_MAX], float tam);
 // int < determ(matrizA, tamMatriz)
 void TreInversaCaller(float [SIZ_MAX][SIZ_MAX], float dest[SIZ_MAX][SIZ_MAX], float);
@@ -30,9 +28,9 @@ void CargarEnArreglo(char *NombreArchivo, float matrix[SIZ_MAX][SIZ_MAX],int tam
 int ObtenerIDHilo(void );
 // Devuelve el ID del hilo.
 void CompartirMat (float matrizOrigen[SIZ_MAX][SIZ_MAX],int key);
-//void CompartirMat (Matriz1D Origen,llave);
+//void CompartirMat (Matriz2D Origen,llave);
 void ObtenerMatCompartida(int key, float matrizDestino[SIZ_MAX][SIZ_MAX]);
-//void ObtenerMatCompartida(llave, matriz1D-Destino)
+//void ObtenerMatCompartida(llave, matriz2D-Destino)
 void CrearEspera(int key);
 //void CrearEspera(llave)
 void TerminarEspera(int key);
@@ -41,6 +39,10 @@ void EliminarDeMemoria (int key);
 //void EliminarDeMemoria (llave)
 void CopiarMatriz(float matrizOrigen[SIZ_MAX][SIZ_MAX],float matrizDestino[SIZ_MAX][SIZ_MAX]);
 //void CopiarMatriz(matrizOrigen,matrizDestino)
+void Matriz2Tuberia(float matriz[SIZ_MAX][SIZ_MAX], int tuberia[]);
+//void Matriz2Tuberia (matrizOrigen, apuntadorTuberia)
+void Tuberia2Matriz(int tuberia[], float matriz[SIZ_MAX][SIZ_MAX]);
+//void Tuberia2Mat(apuntadorTuberia, matrizDestino)
 float determ(float a[SIZ_MAX][SIZ_MAX], float tam)
 {
   float s = 1, det = 0, b[SIZ_MAX][SIZ_MAX];
@@ -118,17 +120,11 @@ void treinversa(float num[SIZ_MAX][SIZ_MAX], float fac[SIZ_MAX][SIZ_MAX], float 
   float b[SIZ_MAX][SIZ_MAX], d;
   for (i = 0;i < r; i++)
      for (j = 0;j < r; j++)
-        {
             b[i][j] = fac[j][i];
-        }
   d = determ(num, r);
-for (i = 0;i < r; i++)
-    {
-        for (j = 0;j < r; j++)
-        {
+  for (i = 0;i < r; i++)
+      for (j = 0;j < r; j++)
             dest[i][j] = b[i][j] / d;
-        }
-    }
  }
  void InsEnMat (float matrix[SIZ_MAX][SIZ_MAX], int row, int column)
 {
@@ -146,7 +142,7 @@ for (i = 0;i < r; i++)
 void ImpMat (float matrix[SIZ_MAX][SIZ_MAX], char* operacion, int nodecim, int nofile, int nomostrar)
 {
     int i, j;
-    FILE *NuevoArchivo;
+    FILE *NuevoArchivo=NULL;
     if(nofile!=1)
       NuevoArchivo = fopen(operacion, "w");
     if(NuevoArchivo!=NULL && nofile!=1)
@@ -364,8 +360,7 @@ void EliminarDeMemoria (int key)
         printf("Error al crear el segmento de memoria.");
         exit(1);
     }
-  if(shmctl(shmid, IPC_RMID, NULL)!=-1)
-    printf("[INFO/EM] %d eliminado de memoria\n",key);
+  shmctl(shmid, IPC_RMID, NULL);
 }
 int ObtenerIDHilo(void ){
     pid_t threadid = syscall(SYS_gettid); 
@@ -375,4 +370,19 @@ void CopiarMatriz(float matrizOrigen[SIZ_MAX][SIZ_MAX],float matrizDestino[SIZ_M
   for(int i=0;i<SIZ_MAX;i++)
     for(int j=0;j<SIZ_MAX;j++)
       matrizDestino[i][j]=matrizOrigen[i][j];
+}
+void Matriz2Tuberia(float matriz[SIZ_MAX][SIZ_MAX], int tuberia[]){
+  for(int i=0;i<SIZ_MAX;i++) //Cada elemento de la matriz, se escribe a la tuberia
+    for(int j=0;j<SIZ_MAX;j++) //
+      write(tuberia[1],&matriz[i][j],sizeof(matriz[i][j]));
+}
+void Tuberia2Matriz(int tuberia[], float matriz[SIZ_MAX][SIZ_MAX]){
+  int cont=0; // Contador para la matriz temporal que es lineal
+  float TempMat[SIZ_MAX*SIZ_MAX],buffer=0;
+    for(int i=0;i<SIZ_MAX*SIZ_MAX;i++) //Leer la tuberia y guardar las cosas en TempMat
+          if(read(tuberia[0], &buffer, sizeof(buffer)))
+            TempMat[cont++]=buffer;
+    for(int i=2;i>=0;i--) //Se empieza desde el ultimo elemento
+      for(int j=2;j>=0;j--)//para no tener que hacer cont=0
+            matriz[i][j]=TempMat[--cont];
 }

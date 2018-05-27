@@ -1,8 +1,9 @@
 CC=gcc
-CFLAGS=-lm -lcurses -Wall -O3 -pthread
+CFLAGS=-lm -Wpedantic -Wshadow -Wall -O3 -pthread
 all: principal 
 principal:
-	$(CC) $(CFLAGS) serv.c -o ImplementacionConMemC
+	$(CC) $(CFLAGS) memcomp.c -o memcomp
+	$(CC) $(CFLAGS) Tuberias.c -o tuberias
 clean:
-	rm ImplementacionConMemC
+	rm memcomp tuberias Inversa*.txt
 

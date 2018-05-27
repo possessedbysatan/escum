@@ -1,7 +1,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include "operadores.h"
-#define SIZ_MAX 3
+#define SIZ_MAX 10
 int main()
 {
     float matrizA[SIZ_MAX][SIZ_MAX],matrizB[SIZ_MAX][SIZ_MAX],resultadoSum[SIZ_MAX][SIZ_MAX],resultadoMult[SIZ_MAX][SIZ_MAX],InvA[SIZ_MAX][SIZ_MAX],InvB[SIZ_MAX][SIZ_MAX];
@@ -48,7 +48,7 @@ int main()
     {
         TreInversaCaller(resultadoMult,InvA,SIZ_MAX);
         printf("Inversa de la multiplicacion: \n");
-        ImpMat(InvA,NULL,0,1,0);
+        ImpMat(InvA,"Inversa de la multiplicacionMem	.txt",0,0,0);
     }
     else
         printf("[ERROR] La multiplicacion no fue L.I.\n");
@@ -57,7 +57,7 @@ int main()
     {
         TreInversaCaller(resultadoSum,InvB,SIZ_MAX);
         printf("Inversa de la suma:\n");
-        ImpMat(InvB,NULL,0,1,0);
+        ImpMat(InvB,"Inversa de la sumaMem.txt",0,0,0);
     }
     else
         printf("[ERROR] La suma no fue L.I.\n");
